@@ -1,0 +1,40 @@
+  
+#version: '2'
+
+#services:
+  gateway:
+    image: cross/elasticsearch
+#    networks:
+#      - net_es
+    environment:
+      UNICAST_HOSTS: master
+      TYPE: GATEWAY
+    ports:
+      - "9200:9200"
+    restart: always
+
+  master:
+    image: cross/elasticsearch
+#    networks:
+#      - net_es
+    environment:
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+      UNICAST_HOSTS: gateway,data
+      TYPE: MASTER
+      MIN_MASTERS: 2
+    restart: always
+
+  data:
+    image: cross/elasticsearch
+#    networks:
+#      - net_es
+    environment:
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+      UNICAST_HOSTS: master,gateway
+      TYPE: DATA
+    restart: always
+
+#networks:
+#  net_es:
+    #driver: bridge
+
